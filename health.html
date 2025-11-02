@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Health Analysis</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f0f8ff;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+      }
+      .heading {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: #003366;
+      }
+      .form-section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #87cefa;
+        border-radius: 8px;
+        background-color: #e6f0fa;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        font-weight: bold;
+        color: #004080;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 8px;
+        font-size: 1rem;
+        border: 1px solid #a9cce3;
+        border-radius: 4px;
+        background-color: #ffffff;
+      }
+      .submit-btn {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #3399ff;
+        color: white;
+        font-size: 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .submit-btn:hover {
+        background-color: #1e90ff;
+      }
+      .result {
+        margin-top: 15px;
+        padding: 12px;
+        background-color: #d0e9ff;
+        border-left: 5px solid #3399ff;
+        font-weight: bold;
+        color: #003366;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="heading">Personalized Health Analysis</h1>
+
+      <!-- Diabetes Form -->
+      <form id="diabetes-form" class="form-section">
+        <h2>Diabetes Information</h2>
+        <div class="form-group">
+          <label>Pregnancies:</label
+          ><input name="pregnancies" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Glucose:</label><input name="glucose" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Blood Pressure:</label
+          ><input name="bp" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Skin Thickness:</label
+          ><input name="skin_thickness" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Insulin:</label><input name="insulin" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>BMI:</label><input name="bmi" type="text" required />
+        </div>
+        <div class="form-group">
+          <label>Diabetes Pedigree Function:</label
+          ><input name="dpf" type="text" required />
+        </div>
+        <div class="form-group">
+          <label>Age:</label><input name="age" type="number" required />
+        </div>
+        <button type="submit" class="submit-btn">Analyze Diabetes</button>
+        <div id="diabetes-result" class="result" style="display: none"></div>
+      </form>
+
+      <!-- Heart Form -->
+      <form id="heart-form" class="form-section">
+        <h2>Heart Disease Information</h2>
+        <div class="form-group">
+          <label>Age:</label><input name="age_hd" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Sex (0=female, 1=male):</label
+          ><input name="sex" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Chest Pain Type (0-3):</label
+          ><input name="cp" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Resting Blood Pressure:</label
+          ><input name="trestbps" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Cholesterol:</label
+          ><input name="chol" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Fasting Blood Sugar (1 = yes, 0 = no):</label
+          ><input name="fbs" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Resting ECG:</label
+          ><input name="restecg" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Max Heart Rate:</label
+          ><input name="thalach" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Exercise-Induced Angina:</label
+          ><input name="exang" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Oldpeak:</label
+          ><input name="oldpeak" type="number" step="0.1" required />
+        </div>
+        <div class="form-group">
+          <label>Slope:</label><input name="slope" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>CA (vessels):</label><input name="ca" type="number" required />
+        </div>
+        <div class="form-group">
+          <label>Thal:</label><input name="thal" type="number" required />
+        </div>
+        <button type="submit" class="submit-btn">Analyze Heart Disease</button>
+        <div id="heart-result" class="result" style="display: none"></div>
+      </form>
+    </div>
+
+    <script>
+      // Diabetes Form
+      document
+        .getElementById("diabetes-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const data = Object.fromEntries(formData.entries());
+          const resultDiv = document.getElementById("diabetes-result");
+
+          try {
+            const response = await fetch(
+              "http://localhost:8000/analyze_diabetes",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+              }
+            );
+            const result = await response.json();
+            resultDiv.innerHTML = `🩺 <strong>Diabetes:</strong> ${
+              result.result == 1 ? "Positive" : "Negative"
+            }`;
+            resultDiv.style.display = "block";
+          } catch (err) {
+            resultDiv.innerHTML = "❌ Error connecting to server.";
+            resultDiv.style.display = "block";
+          }
+        });
+
+      // Heart Form
+      document
+        .getElementById("heart-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const data = Object.fromEntries(formData.entries());
+          const resultDiv = document.getElementById("heart-result");
+
+          try {
+            const response = await fetch(
+              "http://localhost:8000/analyze_heart",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+              }
+            );
+            const result = await response.json();
+            resultDiv.innerHTML = `❤ <strong>Heart Disease:</strong> ${
+              result.result == 1 ? "Positive" : "Negative"
+            }`;
+            resultDiv.style.display = "block";
+          } catch (err) {
+            resultDiv.innerHTML = "❌ Error connecting to server.";
+            resultDiv.style.display = "block";
+          }
+        });
+    </script>
+  </body>
+</html>
